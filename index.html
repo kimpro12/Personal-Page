@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>My Personal Page</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <noscript>
+    <link rel="stylesheet" href="assets/css/noscript.css" />
+  </noscript>
+  <script src="js/vue.min.js" language="JavaScript"></script>
+  <script src="js/jquery-3.4.1.min.js"></script>
+  <script src="js/html2canvas.min.js" async="async"></script>
+  <style>
+    img {
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body class="is-preload">
+  <!-- Loader -->
+  <link rel="stylesheet" href="assets/css/loader.css" />
+  <div class="loader">
+    <div class="container">
+      <h1>🍊</h1>
+      <p>LoaD</p>
+      <p>ing...</p>
+    </div>
+  </div>
+
+  <!-- Wrapper -->
+  <div id="wrapper">
+    <!-- Main -->
+    <section id="main">
+      <!-- Welcome Message and Contacts -->
+      <header v-show="Contacts">
+        <span class="avatar"><img src="images/avatar.jpg" alt="" style="width: 122px; height: 122px" /></span>
+        <h1>Bui Kim</h1>
+        <transition-group name="fade">
+          <div v-show="defaults" key="text">
+            <p>Hi,</p>
+            <p>
+              My name is Bui Ngoc Kim, you can call me Fip which is my name in English.I use this name on most of my
+              project.
+            </p>
+            <button class="button small fit" @click="showAbout" v-bind:disabled="onTransition==1">
+              Click!
+            </button>
+          </div>
+          <div v-for="item in contacts" v-if="item.show" key="item.name" v-html="item.content"></div>
+          <button class="button small" key="button" @click="hideContact(true)" style="opacity: 0.55"
+            v-show="backButton">
+            Back to main Page
+          </button>
+        </transition-group>
+      </header>
+      <hr />
+      <footer v-show="Contacts">
+        <ul class="icons">
+          <li v-for="item in contacts">
+            <a @click="showContact(item.name)" :class="item.icon">{{item.desc}}</a>
+          </li>
+        </ul>
+      </footer>
+
+      <!-- Page container -->
+      <header v-show="info">
+        <transition-group name="fade">
+          <h1 key="title">{{ title }}</h1>
+          <p key="text" v-for="text in texts">{{ text }}</p>
+          <div v-html="html" key="html"></div>
+          <img v-bind:src="img" key="img" style="width: 95%; height: auto" v-for="img in imgs" />
+          <div key="buttons">
+            <button class="button small" v-bind:disabled="(nowPage < startPage || onTransition==1)"
+              @click="navigate(-1)">
+              Prev Page
+            </button>
+            <button class="button small" v-bind:disabled="(nowPage >= endPage - 2 || onTransition==1)"
+              @click="navigate(1)">
+              Next Page
+            </button>
+          </div>
+          <hr key="br" />
+          <button @click="returnToContact" key="button" class="button fit" v-bind:disabled="onTransition==1">
+            Back to the main Page
+          </button>
+        </transition-group>
+      </header>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer"></footer>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    if ("addEventListener" in window) {
+      window.addEventListener("load", function () {
+        document.body.className = document.body.className.replace(
+          /\bis-preload\b/,
+          ""
+        );
+      });
+      document.body.className += navigator.userAgent.match(/(MSIE|rv:11\.0)/)
+        ? " is-ie"
+        : "";
+    }
+  </script>
+  <!-- Vuejs -->
+  <script language="javascript">
+    var mainsec = new Vue({
+      el: "#main",
+      data: {
+        title: "", // The title of one page
+        html: "", // HTML text of one page
+        texts: [], // Pure texts of one page
+        imgs: [], // Image url of a page's images
+
+        startPage: 1, // First page of the website
+        endPage: 3, // The last page of the website
+
+        defaults: 1, // Show welcome message
+        Contacts: 1, // Detect if to show contacts
+        info: 0, // If to show designed pages
+        deg: 0, // Main section rotate deg
+
+        backButton: false,
+        contacts: [
+          {
+            name: "Facebook",
+            icon: "icon brands fa-facebook",
+            desc: "Facebook",
+            content: "https://www.facebook.com/profile.php?id=100078542295560",
+            show: false,
+            jump: true,
+          },
+          {
+            name: "Github",
+            icon: "icon brands fa-github",
+            desc: "Github",
+            content: "https://github.com/kimpro12",
+            show: false,
+            jump: true,
+          },
+        ],
+
+        //Pages content
+        page: [
+          {
+            title: "Page 1",
+            texts: ["Đang học tại chuyên khtn, môn chuyên vật lý. Dù minh là học sinh chuyên lý nhưng mà mình không thích học lý lắm xD. Mình thích thiết kế và làm trang web(thật ra là không thích đâu nhưng mà làm xong có tiền mua bim bim ăn). Mình thích chơi các trò chơi kinh dị-multiplayer(chơi 1 mình sợ v) trong thời gian rảnh."],
+            html: "",
+            imgs: ["images/2.jpg"],
+          },
+          {
+            title: "Page 2",
+            texts: ["Sở thích của mình là nhìn mọi người xung quanh bận rộn với những công việc của họ, xem cách thế giới vận hành"],
+            html: '',
+            imgs: ["images/1.jpg"],
+          },
+          {
+            title: "Eastern egg page!",
+            texts: ["Can only access with ?page=#"],
+            html: "<a href='https://github.com/kimpro12' target='_blank'>Origin project</a>",
+          },
+        ],
+        /*            Change ends here                 */
+
+        nowPage: 0, // Pointer to current page
+        onTransition: 0, //If the transition animation is on
+      },
+      methods: {
+        showContact: function (name) {
+          let num = 0;
+          for (let i = 0; i < this.contacts.length; i++) {
+            if (this.contacts[i].name == name) {
+              num = i;
+              break;
+            }
+          }
+          if (this.contacts[num].jump == true) {
+            window.open(this.contacts[num].content);
+            return;
+          }
+          this.hideContact(false);
+          this.defaults = 0;
+          clearTimeout(this.timer);
+          this.timer = setTimeout(() => {
+            this.contacts[num].show = true;
+            this.backButton = true;
+          }, 500);
+        },
+        hideContact: function (neededDefault = true) {
+          for (i = 0; i < this.contacts.length; i++) {
+            this.contacts[i].show = false;
+          }
+          clearTimeout(this.timer);
+          if (neededDefault == true) {
+            this.backButton = false;
+            this.timer = setTimeout(() => {
+              this.defaults = 1;
+            }, 500);
+          }
+        },
+        showAbout: function () {
+          this.rotateCard(-360, 1, "Y");
+
+          var that = this;
+          setTimeout(function () {
+            that.info = 1;
+            that.Contacts = 0;
+          }, 400);
+        },
+        returnToContact: function () {
+          this.rotateCard(360, 1, "Y");
+          var that = this;
+          setTimeout(function () {
+            that.info = 0;
+            that.Contacts = 1;
+          }, 400);
+        },
+        rotateCard: function (deg, time, axis) {
+          this.onTransition = 1;
+          this.deg += deg;
+          var ele = document.getElementById("main");
+          ele.style.transition = "transform " + time + "s 0s";
+          ele.style.transform = "rotate" + axis + "(" + this.deg + "deg)";
+          var that = this;
+          setTimeout(function () {
+            that.onTransition = 0;
+          }, time * 1000);
+        },
+        loadPage: function () {
+          this.title = this.page[this.nowPage].title;
+          this.texts = this.page[this.nowPage].texts;
+          this.html = this.page[this.nowPage].html;
+          this.imgs = this.page[this.nowPage].imgs;
+        },
+        navigate: function (m) {
+          if (m == 1) {
+            this.nowPage++;
+            this.rotateCard(-360, 1, "Y");
+            setTimeout("mainsec.loadPage()", 400);
+          }
+          if (m == -1) {
+            this.nowPage--;
+            this.rotateCard(+360, 1, "Y");
+            setTimeout("mainsec.loadPage()", 400);
+          }
+        },
+      },
+      mounted: function () {
+        this.loadPage();
+        this.startPage = 1;
+        this.endPage = this.page.length;
+      },
+    });
+  </script>
+  <script src="js/common.js"></script>
+</body>
+
+</html>
